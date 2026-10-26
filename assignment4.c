@@ -5,7 +5,7 @@ int main(){
     int at[10], bt[10], ct[10], tat[10], wt[10];
     int totaltat=0;
     int totalwt=0;
-    int avgtat, avgwt;
+    float avgtat, avgwt;
     
     printf("enter the number of processes :\n");
     scanf("%d", &n);
@@ -51,7 +51,7 @@ int main(){
         printf("\n");
         
     }
-    printf("average turnaround time: %d\n", avgtat);
-        printf("average wait time: %d\n\n", avgwt);
+    printf("average turnaround time: %0.2f\n", avgtat);
+        printf("average wait time: %0.2f\n\n", avgwt);
     return 0;
 }
