@@ -87,51 +87,83 @@ return 0;
 #include <unistd.h>
 #include <sys/types.h>
 
+void sortarray(int a[], int n, int asc) {      // 1 = ascending, 0 = descending
+    int i, j, t;
+    for (i = 0; i < n - 1; i++)
+        for (j = 0; j < n - i - 1; j++)
+            if ((asc && a[j] > a[j+1]) || (!asc && a[j] < a[j+1])) {
+                t = a[j]; a[j] = a[j+1]; a[j+1] = t;
+            }
+}
+
+void printarray(int a[], int n) {
+    for (int i = 0; i < n; i++)
+        printf("%d ", a[i]);
+    printf("\n");
+}
+
 int main() {
-    pid_t pid = fork();
+    int a[50], n, i;
+    pid_t pid;
+
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+    printf("Enter the array: ");
+    for (i = 0; i < n; i++)
+        scanf("%d", &a[i]);
+
+    pid = fork();
 
     if (pid < 0) {
         printf("fork failed\n");
         exit(1);
     }
-    else if (pid == 0) {                    // child
-        printf("Child: PID=%d exiting\n", getpid());
-        exit(0);                            // child dies first
+    else if (pid == 0) {                       // child
+        printf("Child PID=%d sorting ascending:\n", getpid());
+        sortarray(a, n, 1);
+        printarray(a, n);
+        exit(0);                               // child dies first
     }
-    else {                                  // parent
-        printf("Parent: PID=%d sleeping, not calling wait()\n", getpid());
-        sleep(30);                          // child is a zombie during this
-        printf("Parent: done\n");
+    else {                                     // parent
+        printf("Parent PID=%d sleeping, NOT calling wait()\n", getpid());
+        sleep(30);                             // child is a zombie meanwhile
+        printf("Parent done\n");
     }
     return 0;
 }
 
 
 
-
-
 //orphan process
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
 
 int main() {
-    pid_t pid = fork();
+    int a[50], n, i;
+    pid_t pid;
+
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+    printf("Enter the array: ");
+    for (i = 0; i < n; i++)
+        scanf("%d", &a[i]);
+
+    pid = fork();
 
     if (pid < 0) {
         printf("fork failed\n");
         exit(1);
     }
-    else if (pid == 0) {                    // child
-        printf("Child: PID=%d, PPID=%d (parent alive)\n", getpid(), getppid());
-        sleep(5);                           // keeps child alive while parent dies
-        printf("Child: PID=%d, PPID=%d (now orphan)\n", getpid(), getppid());
+    else if (pid == 0) {                       // child
+        printf("Child PID=%d, PPID=%d (parent alive)\n", getpid(), getppid());
+        sleep(5);                              // parent dies meanwhile
+        printf("Child PID=%d, PPID=%d (now orphan), sorting descending:\n",
+               getpid(), getppid());
+        sortarray(a, n, 0);
+        printarray(a, n);
     }
-    else {                                  // parent
-        printf("Parent: PID=%d exiting\n", getpid());
-        exit(0);                            // parent dies first
+    else {                                     // parent
+        printf("Parent PID=%d exiting\n", getpid());
+        exit(0);                               // parent dies first
     }
     return 0;
 }
