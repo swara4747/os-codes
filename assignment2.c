@@ -78,3 +78,60 @@ printarray(a, n);
 
 return 0;
 }
+
+
+//zombie process 
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+
+int main() {
+    pid_t pid = fork();
+
+    if (pid < 0) {
+        printf("fork failed\n");
+        exit(1);
+    }
+    else if (pid == 0) {                    // child
+        printf("Child: PID=%d exiting\n", getpid());
+        exit(0);                            // child dies first
+    }
+    else {                                  // parent
+        printf("Parent: PID=%d sleeping, not calling wait()\n", getpid());
+        sleep(30);                          // child is a zombie during this
+        printf("Parent: done\n");
+    }
+    return 0;
+}
+
+
+
+
+
+//orphan process
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+
+int main() {
+    pid_t pid = fork();
+
+    if (pid < 0) {
+        printf("fork failed\n");
+        exit(1);
+    }
+    else if (pid == 0) {                    // child
+        printf("Child: PID=%d, PPID=%d (parent alive)\n", getpid(), getppid());
+        sleep(5);                           // keeps child alive while parent dies
+        printf("Child: PID=%d, PPID=%d (now orphan)\n", getpid(), getppid());
+    }
+    else {                                  // parent
+        printf("Parent: PID=%d exiting\n", getpid());
+        exit(0);                            // parent dies first
+    }
+    return 0;
+}
